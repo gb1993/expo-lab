@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Finapp",
+    "slug": "",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/brand-welcome.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/brand-welcome.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/brand-welcome.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/brand-welcome.png"
+    },
+    "plugins": ["expo-font", "expo-splash-screen"]
+  }
+}
