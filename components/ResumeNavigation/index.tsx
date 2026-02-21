@@ -27,9 +27,13 @@ export default function ResumeNavigation() {
             heightVariant={50}
             iconName="auto-graph"
             iconSize={24}
-            onPress={() => navigation.navigate('dashboard')}
+            onPress={() =>
+              navigation.navigate('main', {
+                screen: 'dashboard',
+              })
+            }
           />
-          <CustomText text="Dashboard" color={theme.colors.primary} />
+          <CustomText text="Relatórios" color={theme.colors.primary} />
         </View>
         <View style={styles.bottomButton}>
           <CustomButton
@@ -37,7 +41,11 @@ export default function ResumeNavigation() {
             heightVariant={50}
             iconName="person-search"
             iconSize={24}
-            onPress={() => navigation.navigate('customers')}
+            onPress={() =>
+              navigation.navigate('main', {
+                screen: 'customers',
+              })
+            }
           />
           <CustomText text="Clientes" color={theme.colors.primary} />
         </View>
@@ -48,7 +56,11 @@ export default function ResumeNavigation() {
             iconName="attach-money"
             IconLibrary={MaterialIcons}
             iconSize={24}
-            onPress={() => navigation.navigate('loans')}
+            onPress={() =>
+              navigation.navigate('main', {
+                screen: 'loans',
+              })
+            }
           />
           <CustomText text="Empréstimos" color={theme.colors.primary} />
         </View>

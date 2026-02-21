@@ -36,7 +36,11 @@ export default function Header() {
             iconName="user-alt"
             IconLibrary={FontAwesome5}
             iconSize={30}
-            onPress={() => navigation.navigate('myAccount')}
+            onPress={() =>
+              navigation.navigate('main', {
+                screen: 'myAccount',
+              })
+            }
           />
         </View>
       </View>

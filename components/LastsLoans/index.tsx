@@ -1,4 +1,4 @@
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {FlatList, Pressable, StyleSheet, View} from 'react-native';
 import CustomButton from '../CustomButton';
 import {useAppNavigation} from '../../hooks/useAppNavigation';
 import {theme} from '../../themes';
@@ -8,33 +8,67 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 interface Loan {
   customerName: string;
   loanDateTime: string;
-  loanValue: string;
+  loanValue: number; // Alterado para number para melhor formatação
 }
 
 const lastLoans: Loan[] = [
   {
     customerName: 'Fulano de tal',
     loanDateTime: '20/02/2026 23:57',
-    loanValue: 'R$ 1000,50',
+    loanValue: 1000.5,
   },
   {
     customerName: 'Fulano de tal',
     loanDateTime: '20/02/2026 23:57',
-    loanValue: 'R$ 1000,50',
+    loanValue: 1000.5,
   },
   {
     customerName: 'Fulano de tal',
     loanDateTime: '20/02/2026 23:57',
-    loanValue: 'R$ 1000,50',
+    loanValue: 1000.5,
   },
 ];
+
+// Componente individual do item
+function LoanItem({loan}: {loan: Loan}) {
+  const navigation = useAppNavigation();
+
+  return (
+    <Pressable
+      style={styles.content}
+      onPress={() =>
+        navigation.navigate('main', {
+          screen: 'loans',
+        })
+      }>
+      <FontAwesome6
+        name="money-bill-transfer"
+        size={24}
+        color={theme.colors.green}
+      />
+      <View style={styles.infos}>
+        <CustomText text={loan.customerName} weight="bold" fontSize="md" />
+        <CustomText fontSize="sm" text={loan.loanDateTime} />
+      </View>
+      <CustomText
+        fontSize="md"
+        weight="bold"
+        text={loan.loanValue.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        })}
+        color={theme.colors.green}
+      />
+    </Pressable>
+  );
+}
 
 export default function LastsLoans() {
   const navigation = useAppNavigation();
 
   if (lastLoans.length === 0) {
     return (
-      <View style={styles.container}>
+      <View style={styles.emptyContainer}>
         <CustomText
           text="Nenhum empréstimo realizado"
           color={theme.colors.purpleSecondary}
@@ -51,36 +85,20 @@ export default function LastsLoans() {
   }
 
   return (
-    <Pressable
-      style={styles.container}
-      onPress={() => navigation.navigate('loans')}>
-      <CustomText
-        text="Últimos empréstimos"
-        color={theme.colors.purpleSecondary}
-        fontSize="lg"
-        weight="bold"
-      />
-
-      {lastLoans.map((loan, index) => (
-        <View style={styles.content} key={`${loan.loanDateTime}-${index}`}>
-          <FontAwesome6
-            name="money-bill-transfer"
-            size={24}
-            color={theme.colors.green}
-          />
-          <View style={styles.infos}>
-            <CustomText text={loan.customerName} weight="bold" fontSize="md" />
-            <CustomText fontSize="sm" text={loan.loanDateTime} />
-          </View>
-          <CustomText
-            fontSize="md"
-            weight="bold"
-            text={loan.loanValue}
-            color={theme.colors.green}
-          />
-        </View>
-      ))}
-    </Pressable>
+    <FlatList
+      data={lastLoans}
+      keyExtractor={(item, index) => `${item.loanDateTime}-${index}`}
+      ListHeaderComponent={
+        <CustomText
+          text="Últimos empréstimos"
+          color={theme.colors.purpleSecondary}
+          fontSize="lg"
+          weight="bold"
+        />
+      }
+      renderItem={({item}) => <LoanItem loan={item} />}
+      contentContainerStyle={styles.container}
+    />
   );
 }
 
@@ -91,17 +109,25 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xxl,
     gap: theme.spacing.lg,
   },
+  emptyContainer: {
+    width: theme.width.container,
+    alignSelf: 'center',
+    marginTop: theme.spacing.xxl,
+    gap: theme.spacing.lg,
+    alignItems: 'center',
+  },
   content: {
     backgroundColor: theme.colors.secondary,
-    boxShadow: theme.boxShadow.md,
     borderRadius: theme.borderRadius.lg,
     paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: theme.spacing.xl,
+    boxShadow: theme.boxShadow.md
   },
   infos: {
+    flex: 1, // Faz o texto ocupar o espaço disponível
     gap: theme.spacing.xs,
   },
 });
