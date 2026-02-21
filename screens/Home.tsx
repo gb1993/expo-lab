@@ -1,17 +1,13 @@
-import CustomButton from '../components/CustomButton';
-import {CustomText} from '../components/CustomText';
-import {useAppNavigation} from '../hooks/useAppNavigation';
+import CustomText from '../components/CustomText';
+import Header from '../components/Header';
+import LastsLoans from '../components/LastsLoans';
 
 export default function Home() {
-  const navigation = useAppNavigation();
   return (
     <>
+      <Header />
       <CustomText text="Home" />
-      <CustomButton
-        text="Detalhes"
-        onPress={() => navigation.navigate('detail')}
-        widthVariant={138}
-      />
+      <LastsLoans />
     </>
   );
 }

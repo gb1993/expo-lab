@@ -1,9 +1,12 @@
+import {Dimensions} from 'react-native';
+
+const themeSpacingLg = 24;
 export const theme = {
   colors: {
     primary: '#100D40',
     purpleSecondary: '#0B0657',
-    secondary: '#F8FCFC',
-    whiteSecondary: '#F2F2F2',
+    secondary: '#ffffff',
+    page: '#F5F5F5'
   },
   fonts: {
     light: 'RobotoCondensed_300Light',
@@ -22,8 +25,12 @@ export const theme = {
     xs: 4,
     sm: 8,
     md: 16,
-    lg: 24,
+    lg: themeSpacingLg,
     xl: 32,
+    xxl: 64,
+  },
+  border: {
+    default: '#F2F2F2',
   },
   borderRadius: {
     sm: 7,
@@ -37,5 +44,8 @@ export const theme = {
     md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
     lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
     xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+  },
+  width: {
+    container: Dimensions.get('window').width - themeSpacingLg - themeSpacingLg,
   },
 };

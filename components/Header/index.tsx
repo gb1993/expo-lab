@@ -1,11 +1,13 @@
-import { Image, StyleSheet, View } from 'react-native';
-import { theme } from '../../themes';
+import {Image, StyleSheet, View} from 'react-native';
+import {theme} from '../../themes';
 import ResumeNavigation from '../ResumeNavigation';
-import { CustomText } from '../CustomText';
+import CustomText from '../CustomText';
 import CustomButton from '../CustomButton';
-import { FontAwesome5 } from '@expo/vector-icons';
+import {FontAwesome5} from '@expo/vector-icons';
+import {useAppNavigation} from '../../hooks/useAppNavigation';
 
 export default function Header() {
+  const navigation = useAppNavigation();
   return (
     <View style={styles.container}>
       <Image
@@ -14,11 +16,19 @@ export default function Header() {
       />
       <View style={styles.topContent}>
         <View>
-          <CustomText fontSize='md' text={`Bem vindo,`} />
-          <CustomText fontSize='lg' weight='bold' text={`Pobre`} />
+          <CustomText fontSize="md" text={`Bem vindo,`} />
+          <CustomText fontSize="lg" weight="bold" text={`Pobre`} />
         </View>
         <View>
-          <CustomButton widthVariant={44} heightVariant={50} iconName="user-alt" iconColor="white" IconLibrary={FontAwesome5} iconSize={32} />
+          <CustomButton
+            widthVariant={44}
+            heightVariant={50}
+            backgroundColor="transparent"
+            iconName="user-alt"
+            IconLibrary={FontAwesome5}
+            iconSize={30}
+            onPress={() => navigation.navigate('myAccount')}
+          />
         </View>
       </View>
       <ResumeNavigation />
@@ -42,7 +52,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -10,
     right: -10,
-    zIndex: 2,
+    pointerEvents: 'none',
   },
   topContent: {
     width: '100%',

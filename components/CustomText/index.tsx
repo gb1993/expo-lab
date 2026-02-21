@@ -8,7 +8,7 @@ interface CustomTextProps extends TextProps {
   text: string;
 }
 
-export function CustomText({
+export default function CustomText({
   text,
   weight = 'regular',
   fontSize = 'md',

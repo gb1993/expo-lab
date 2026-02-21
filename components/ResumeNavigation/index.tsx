@@ -1,10 +1,12 @@
-import { StyleSheet, View } from 'react-native';
-import { theme } from '../../themes';
-import { CustomText } from '../CustomText';
+import {StyleSheet, View} from 'react-native';
+import {theme} from '../../themes';
+import CustomText from '../CustomText';
 import CustomButton from '../CustomButton';
-import { MaterialIcons } from '@expo/vector-icons';
+import {MaterialIcons} from '@expo/vector-icons';
+import {useAppNavigation} from '../../hooks/useAppNavigation';
 
 export default function ResumeNavigation() {
+  const navigation = useAppNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -25,6 +27,7 @@ export default function ResumeNavigation() {
             heightVariant={50}
             iconName="auto-graph"
             iconSize={24}
+            onPress={() => navigation.navigate('dashboard')}
           />
           <CustomText text="Dashboard" color={theme.colors.primary} />
         </View>
@@ -34,6 +37,7 @@ export default function ResumeNavigation() {
             heightVariant={50}
             iconName="person-search"
             iconSize={24}
+            onPress={() => navigation.navigate('customers')}
           />
           <CustomText text="Clientes" color={theme.colors.primary} />
         </View>
@@ -44,6 +48,7 @@ export default function ResumeNavigation() {
             iconName="attach-money"
             IconLibrary={MaterialIcons}
             iconSize={24}
+            onPress={() => navigation.navigate('loans')}
           />
           <CustomText text="Empréstimos" color={theme.colors.primary} />
         </View>
@@ -70,7 +75,7 @@ const styles = StyleSheet.create({
   top: {
     width: '100%',
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.whiteSecondary,
+    borderBottomColor: theme.border.default,
   },
   topContent: {
     width: '100%',

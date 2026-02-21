@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {theme} from '../../themes';
 
 interface ScreenContainerProps {
@@ -7,8 +7,11 @@ interface ScreenContainerProps {
 }
 
 export default function ScreenContainer({children}: ScreenContainerProps) {
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView
+      style={{...styles.container, paddingBottom: insets.bottom + 16}}
+      edges={['bottom', 'left', 'right']}>
       {children}
     </SafeAreaView>
   );
@@ -17,6 +20,6 @@ export default function ScreenContainer({children}: ScreenContainerProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.page,
   },
 });
