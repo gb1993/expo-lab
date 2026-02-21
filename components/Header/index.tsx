@@ -16,8 +16,17 @@ export default function Header() {
       />
       <View style={styles.topContent}>
         <View>
-          <CustomText fontSize="md" text={`Bem vindo,`} />
-          <CustomText fontSize="lg" weight="bold" text={`Pobre`} />
+          <CustomText
+            fontSize="md"
+            text={`Olá,`}
+            color={theme.colors.secondary}
+          />
+          <CustomText
+            fontSize="lg"
+            weight="bold"
+            text={`Pobre`}
+            color={theme.colors.secondary}
+          />
         </View>
         <View>
           <CustomButton

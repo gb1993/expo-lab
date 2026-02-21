@@ -34,11 +34,17 @@ export default function LastsLoans() {
 
   if (lastLoans.length === 0) {
     return (
-      <View>
-        <Text>Nenhum empréstimo realizado</Text>
+      <View style={styles.container}>
+        <CustomText
+          text="Nenhum empréstimo realizado"
+          color={theme.colors.purpleSecondary}
+          fontSize="lg"
+          weight="bold"
+        />
         <CustomButton
           onPress={() => navigation.navigate('loans')}
           text="Realize seu primeiro aqui"
+          textColor={theme.colors.secondary}
         />
       </View>
     );
@@ -60,13 +66,18 @@ export default function LastsLoans() {
           <FontAwesome6
             name="money-bill-transfer"
             size={24}
-            color={theme.colors.purpleSecondary}
+            color={theme.colors.green}
           />
-          <View>
-            <Text>{loan.customerName}</Text>
-            <Text>{loan.loanDateTime}</Text>
+          <View style={styles.infos}>
+            <CustomText text={loan.customerName} weight="bold" fontSize="md" />
+            <CustomText fontSize="sm" text={loan.loanDateTime} />
           </View>
-          <Text>{loan.loanValue}</Text>
+          <CustomText
+            fontSize="md"
+            weight="bold"
+            text={loan.loanValue}
+            color={theme.colors.green}
+          />
         </View>
       ))}
     </Pressable>
@@ -89,5 +100,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  infos: {
+    gap: theme.spacing.xs,
   },
 });

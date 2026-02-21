@@ -1,12 +1,14 @@
 import {Dimensions} from 'react-native';
 
 const themeSpacingLg = 24;
+const themeWhiteSecondary = '#F5F5F5';
 export const theme = {
   colors: {
     primary: '#100D40',
     purpleSecondary: '#0B0657',
     secondary: '#ffffff',
-    page: '#F5F5F5'
+    page: themeWhiteSecondary,
+    green: '#344E41',
   },
   fonts: {
     light: 'RobotoCondensed_300Light',
@@ -30,7 +32,7 @@ export const theme = {
     xxl: 64,
   },
   border: {
-    default: '#F2F2F2',
+    default: themeWhiteSecondary,
   },
   borderRadius: {
     sm: 7,

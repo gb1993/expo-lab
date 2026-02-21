@@ -12,7 +12,7 @@ export default function CustomText({
   text,
   weight = 'regular',
   fontSize = 'md',
-  color = theme.colors.secondary,
+  color = theme.colors.purpleSecondary,
 }: CustomTextProps) {
   return (
     <Text

@@ -7,6 +7,7 @@ interface CustomButtonProps<
   LibraryComponent extends React.ComponentType<any>,
 > extends PressableProps {
   text?: string;
+  textColor?: string;
   icon?: React.ReactNode;
   iconName?: React.ComponentProps<LibraryComponent>['name'];
   iconSize?: number;
@@ -22,6 +23,7 @@ export default function CustomButton<
   LibraryComponent extends React.ComponentType<any> = typeof MaterialIcons,
 >({
   text,
+  textColor = theme.colors.secondary,
   icon,
   iconName,
   iconSize = 18,
@@ -50,13 +52,7 @@ export default function CustomButton<
       ]}
       {...props}>
       {finalIcon && iconPosition === 'left' && finalIcon}
-      {text && (
-        <CustomText
-          weight="bold"
-          text={text}
-          style={{color: theme.colors.secondary}}
-        />
-      )}
+      {text && <CustomText weight="bold" text={text} color={textColor} />}
       {finalIcon && iconPosition === 'right' && finalIcon}
     </Pressable>
   );
