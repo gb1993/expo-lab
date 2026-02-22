@@ -13,6 +13,8 @@ export default function CustomText({
   weight = 'regular',
   fontSize = 'md',
   color = theme.colors.purpleSecondary,
+  style,
+  ...rest
 }: CustomTextProps) {
   return (
     <Text
@@ -22,7 +24,10 @@ export default function CustomText({
           fontSize: theme.fontSize[fontSize],
           color,
         },
-      ]}>
+        style,
+      ]}
+      {...rest}
+    >
       {text}
     </Text>
   );

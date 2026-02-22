@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Finapp",
-    "slug": "",
+    "slug": "finapp","scheme": "finapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/brand-welcome.png",

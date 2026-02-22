@@ -16,7 +16,7 @@ export default function ResumeNavigation() {
             text="R$ 200.00"
             fontSize="lg"
             weight="bold"
-            color={theme.colors.primary}
+            color={theme.colors.green}
           />
         </View>
       </View>
