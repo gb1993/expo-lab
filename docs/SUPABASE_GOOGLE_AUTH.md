@@ -21,10 +21,10 @@ No Supabase:
 
 3. **Redirect URLs**: adicione **`finapp://auth/callback`** (para o link do email abrir o app após clicar).
 
-2. **Authentication → Email Templates** (opcional)  
+4. **Authentication → Email Templates** (opcional)  
    Ajuste o template “Confirm signup” se quiser. O link de confirmação enviado por email deve redirecionar para a URL acima para o app abrir e concluir o login.
 
-4. Salve. Novos emails de confirmação passarão a usar o link correto; emails já enviados continuam com o link antigo (localhost:3000).
+5. Salve. Novos emails de confirmação passarão a usar o link correto; emails já enviados continuam com o link antigo (localhost:3000).
 
 ## 3. Senha e armazenamento
 

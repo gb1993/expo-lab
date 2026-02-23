@@ -10,7 +10,11 @@ export default function ScreenContainer({children}: ScreenContainerProps) {
   const insets = useSafeAreaInsets();
   return (
     <SafeAreaView
-      style={{...styles.container, paddingBottom: insets.bottom}}
+      style={{
+        ...styles.container,
+        paddingBottom: insets.bottom,
+        paddingTop: insets.top + 4,
+      }}
       edges={['bottom', 'left', 'right']}>
       {children}
     </SafeAreaView>

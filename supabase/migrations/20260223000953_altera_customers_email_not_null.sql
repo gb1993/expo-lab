@@ -1,0 +1,4 @@
+ALTER TABLE public.customers 
+  ALTER COLUMN email DROP NOT NULL,
+  ALTER COLUMN name SET NOT NULL,
+  ALTER COLUMN celular SET NOT NULL;

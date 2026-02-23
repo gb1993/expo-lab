@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -6,8 +6,8 @@ import {
   TextInputProps,
   View,
 } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { theme } from '../../themes';
+import {MaterialIcons} from '@expo/vector-icons';
+import {theme} from '../../themes';
 
 type PasswordInputProps = TextInputProps & {
   inputStyle?: object;
@@ -29,10 +29,9 @@ export default function PasswordInput({
         placeholderTextColor={props.placeholderTextColor ?? '#999'}
       />
       <Pressable
-        onPress={() => setVisible((v) => !v)}
+        onPress={() => setVisible(v => !v)}
         style={styles.iconButton}
-        hitSlop={12}
-      >
+        hitSlop={12}>
         <MaterialIcons
           name={visible ? 'visibility-off' : 'visibility'}
           size={24}

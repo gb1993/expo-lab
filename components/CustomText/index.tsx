@@ -5,7 +5,7 @@ interface CustomTextProps extends TextProps {
   weight?: 'light' | 'regular' | 'medium' | 'bold';
   fontSize?: keyof typeof theme.fontSize;
   color?: string;
-  text: string;
+  text?: string;
 }
 
 export default function CustomText({
@@ -26,8 +26,7 @@ export default function CustomText({
         },
         style,
       ]}
-      {...rest}
-    >
+      {...rest}>
       {text}
     </Text>
   );

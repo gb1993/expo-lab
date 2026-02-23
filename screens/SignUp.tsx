@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -8,13 +8,13 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {useNavigation} from '@react-navigation/native';
+import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import CustomButton from '../components/CustomButton';
 import CustomText from '../components/CustomText';
 import PasswordInput from '../components/PasswordInput';
-import { theme } from '../themes';
-import { supabase } from '../lib/supabase';
+import {theme} from '../themes';
+import {supabase} from '../lib/supabase';
 
 type AuthStackParamList = {
   login: undefined;
@@ -22,40 +22,48 @@ type AuthStackParamList = {
 };
 
 /** Regras: 8+ caracteres, letras, números e pelo menos um caractere especial. */
-function validatePassword(value: string): { valid: boolean; message: string } {
+function validatePassword(value: string): {valid: boolean; message: string} {
   if (value.length < 8) {
-    return { valid: false, message: 'A senha deve ter 8 caracteres ou mais.' };
+    return {valid: false, message: 'A senha deve ter 8 caracteres ou mais.'};
   }
   if (!/[a-zA-Z]/.test(value)) {
-    return { valid: false, message: 'A senha deve conter pelo menos uma letra.' };
+    return {valid: false, message: 'A senha deve conter pelo menos uma letra.'};
   }
   if (!/\d/.test(value)) {
-    return { valid: false, message: 'A senha deve conter pelo menos um número.' };
+    return {valid: false, message: 'A senha deve conter pelo menos um número.'};
   }
   if (!/[!@#$%^&*()_+\-=[\]{}|;':",.<>?/`~\\]/.test(value)) {
     return {
       valid: false,
-      message: 'A senha deve conter pelo menos um caractere especial (!@#$%^&* etc.).',
+      message:
+        'A senha deve conter pelo menos um caractere especial (!@#$%^&* etc.).',
     };
   }
-  return { valid: true, message: '' };
+  return {valid: true, message: ''};
 }
 
 export default function SignUp() {
-  const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList, 'signUp'>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AuthStackParamList, 'signUp'>>();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
   const [emailSent, setEmailSent] = useState(false);
   const [resendCountdown, setResendCountdown] = useState(0);
   const [resending, setResending] = useState(false);
 
   useEffect(() => {
     if (resendCountdown <= 0) return;
-    const t = setInterval(() => setResendCountdown((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    const t = setInterval(
+      () => setResendCountdown(s => (s <= 1 ? 0 : s - 1)),
+      1000,
+    );
     return () => clearInterval(t);
   }, [resendCountdown]);
 
@@ -63,14 +71,14 @@ export default function SignUp() {
     if (resendCountdown > 0 || resending || !email.trim()) return;
     setResending(true);
     setMessage(null);
-    const { error } = await supabase.auth.resend({
+    const {error} = await supabase.auth.resend({
       type: 'signup',
       email: email.trim(),
-      options: { emailRedirectTo: 'finapp://auth/callback' },
+      options: {emailRedirectTo: 'finapp://auth/callback'},
     });
     setResending(false);
     if (error) {
-      setMessage({ type: 'error', text: error.message });
+      setMessage({type: 'error', text: error.message});
       return;
     }
     setMessage({
@@ -82,31 +90,31 @@ export default function SignUp() {
 
   async function handleSignUp() {
     if (!email.trim() || !password) {
-      setMessage({ type: 'error', text: 'Preencha email e senha.' });
+      setMessage({type: 'error', text: 'Preencha email e senha.'});
       return;
     }
     if (password !== passwordConfirm) {
-      setMessage({ type: 'error', text: 'As senhas não coincidem.' });
+      setMessage({type: 'error', text: 'As senhas não coincidem.'});
       return;
     }
     const passwordCheck = validatePassword(password);
     if (!passwordCheck.valid) {
-      setMessage({ type: 'error', text: passwordCheck.message });
+      setMessage({type: 'error', text: passwordCheck.message});
       return;
     }
     setLoading(true);
     setMessage(null);
-    const { data, error } = await supabase.auth.signUp({
+    const {data, error} = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
         emailRedirectTo: 'finapp://auth/callback',
-        data: name.trim() ? { full_name: name.trim() } : undefined,
+        data: name.trim() ? {full_name: name.trim()} : undefined,
       },
     });
     setLoading(false);
     if (error) {
-      setMessage({ type: 'error', text: error.message });
+      setMessage({type: 'error', text: error.message});
       return;
     }
     if (data?.user && !data.session) {
@@ -119,20 +127,18 @@ export default function SignUp() {
       return;
     }
     if (data?.session) {
-      setMessage({ type: 'success', text: 'Conta criada com sucesso.' });
+      setMessage({type: 'success', text: 'Conta criada com sucesso.'});
     }
   }
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <CustomText
           fontSize="xl"
           weight="bold"
@@ -146,31 +152,46 @@ export default function SignUp() {
         />
 
         <View style={styles.form}>
-          <CustomText fontSize="sm" weight="medium" text="Nome" color={theme.colors.primary} />
+          <CustomText
+            fontSize="sm"
+            weight="medium"
+            text="Nome"
+            color={theme.colors.primary}
+          />
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
             placeholder="Seu nome"
-            placeholderTextColor={"#999"}
+            placeholderTextColor={'#999'}
             autoCapitalize="words"
             editable={!loading}
           />
 
-          <CustomText fontSize="sm" weight="medium" text="Email" color={theme.colors.primary} />
+          <CustomText
+            fontSize="sm"
+            weight="medium"
+            text="Email"
+            color={theme.colors.primary}
+          />
           <TextInput
             style={styles.input}
             value={email}
             onChangeText={setEmail}
             placeholder="seu@email.com"
-            placeholderTextColor={"#999"}
+            placeholderTextColor={'#999'}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
             editable={!loading}
           />
 
-          <CustomText fontSize="sm" weight="medium" text="Senha" color={theme.colors.primary} />
+          <CustomText
+            fontSize="sm"
+            weight="medium"
+            text="Senha"
+            color={theme.colors.primary}
+          />
           <CustomText
             fontSize="xs"
             text="8+ caracteres, letras, números e um caractere especial (!@#$%...)"
@@ -186,7 +207,12 @@ export default function SignUp() {
             editable={!loading}
           />
 
-          <CustomText fontSize="sm" weight="medium" text="Confirmar senha" color={theme.colors.primary} />
+          <CustomText
+            fontSize="sm"
+            weight="medium"
+            text="Confirmar senha"
+            color={theme.colors.primary}
+          />
           <PasswordInput
             style={styles.inputWrapper}
             value={passwordConfirm}
@@ -200,13 +226,16 @@ export default function SignUp() {
             <View
               style={[
                 styles.messageBox,
-                message.type === 'error' ? styles.messageError : styles.messageSuccess,
-              ]}
-            >
+                message.type === 'error'
+                  ? styles.messageError
+                  : styles.messageSuccess,
+              ]}>
               <CustomText
                 fontSize="sm"
                 text={message.text}
-                color={message.type === 'error' ? '#b91c1c' : theme.colors.green}
+                color={
+                  message.type === 'error' ? '#b91c1c' : theme.colors.green
+                }
               />
             </View>
           )}
@@ -215,8 +244,10 @@ export default function SignUp() {
             <Pressable
               onPress={handleResend}
               disabled={resendCountdown > 0 || resending}
-              style={[styles.resendRow, resendCountdown > 0 && styles.resendDisabled]}
-            >
+              style={[
+                styles.resendRow,
+                resendCountdown > 0 && styles.resendDisabled,
+              ]}>
               <CustomText
                 fontSize="sm"
                 text="Não recebi o email."
@@ -247,8 +278,7 @@ export default function SignUp() {
           <Pressable
             onPress={() => navigation.navigate('login')}
             style={styles.linkButton}
-            disabled={loading}
-          >
+            disabled={loading}>
             <CustomText
               fontSize="md"
               text="Já tem conta? Entrar"

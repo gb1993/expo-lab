@@ -9,9 +9,9 @@ export const theme = {
     secondary: '#ffffff',
     page: themeWhiteSecondary,
     green: '#344E41',
-    alert: '#27200a',
-    danger: '#2c0b0e',
-    success: '#051b11',
+    alert: '#c0a139',
+    danger: '#c2404b',
+    success: '#2dac73',
   },
   fonts: {
     light: 'RobotoCondensed_300Light',

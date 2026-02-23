@@ -1,8 +1,8 @@
-import type { Session } from '@supabase/supabase-js';
-import { type PropsWithChildren, useEffect, useState } from 'react';
-import { Linking } from 'react-native';
-import { AuthContext } from '../hooks/useAuthContext';
-import { supabase } from '../lib/supabase';
+import type {Session} from '@supabase/supabase-js';
+import {type PropsWithChildren, useEffect, useState} from 'react';
+import {Linking} from 'react-native';
+import {AuthContext} from '../hooks/useAuthContext';
+import {supabase} from '../lib/supabase';
 
 function extractParamsFromUrl(url: string) {
   try {
@@ -14,18 +14,18 @@ function extractParamsFromUrl(url: string) {
       refresh_token: params.get('refresh_token'),
     };
   } catch {
-    return { access_token: null, refresh_token: null };
+    return {access_token: null, refresh_token: null};
   }
 }
 
-export default function AuthProvider({ children }: PropsWithChildren) {
+export default function AuthProvider({children}: PropsWithChildren) {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadSession = async () => {
       const {
-        data: { session: currentSession },
+        data: {session: currentSession},
         error,
       } = await supabase.auth.getSession();
       if (error) console.error('Erro ao carregar sessão:', error);
@@ -36,7 +36,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     loadSession();
 
     const {
-      data: { subscription },
+      data: {subscription},
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
     });
@@ -57,7 +57,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
     };
 
     Linking.getInitialURL().then(handleDeepLink);
-    const sub = Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
+    const sub = Linking.addEventListener('url', ({url}) => handleDeepLink(url));
     return () => sub.remove();
   }, []);
 
@@ -67,8 +67,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
         session,
         isLoading,
         isLoggedIn: !!session,
-      }}
-    >
+      }}>
       {children}
     </AuthContext.Provider>
   );
