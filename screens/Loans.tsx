@@ -37,17 +37,21 @@ export default function Loans() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('Todos');
-  const [selectedLoan, setSelectedLoan] = useState<LoanWithCustomer | null>(null);
+  const [selectedLoan, setSelectedLoan] = useState<LoanWithCustomer | null>(
+    null,
+  );
 
   // Estados para o Novo Empréstimo
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [customerSearch, setCustomerSearch] = useState('');
   const [foundCustomers, setFoundCustomers] = useState<CustomerRow[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerRow | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerRow | null>(
+    null,
+  );
   const [loanForm, setLoanForm] = useState({
     valor: '',
     juros: '',
-    cobranca: 'mensal' as 'semanal' | 'quinzenal' | 'mensal'
+    cobranca: 'mensal' as 'semanal' | 'quinzenal' | 'mensal',
   });
 
   useEffect(() => {
@@ -93,7 +97,7 @@ export default function Loans() {
       valor: parseFloat(loanForm.valor.replace(',', '.')),
       juros: parseFloat(loanForm.juros.replace(',', '.')) / 100,
       cobranca: loanForm.cobranca,
-      status: 'ativo'
+      status: 'ativo',
     };
 
     const {error} = await supabase.from('loans').insert([newLoan]);
@@ -111,7 +115,7 @@ export default function Loans() {
     setIsAddModalVisible(false);
     setSelectedCustomer(null);
     setCustomerSearch('');
-    setLoanForm({ valor: '', juros: '', cobranca: 'mensal' });
+    setLoanForm({valor: '', juros: '', cobranca: 'mensal'});
   }
 
   const formatFriendlyDate = (dateString: string) => {
@@ -124,17 +128,25 @@ export default function Loans() {
 
   function getStatusColor(status: string | null) {
     switch (status?.toLowerCase()) {
-      case 'ativo': return theme.colors.alert;
-      case 'finalizado': return theme.colors.success;
-      case 'atrasado': return theme.colors.danger;
-      default: return theme.colors.purpleSecondary;
+      case 'ativo':
+        return theme.colors.alert;
+      case 'finalizado':
+        return theme.colors.success;
+      case 'atrasado':
+        return theme.colors.danger;
+      default:
+        return theme.colors.purpleSecondary;
     }
   }
 
   const filteredLoans = useMemo(() => {
     return loans.filter(loan => {
-      const matchesSearch = loan.customers?.name?.toLowerCase().includes(search.toLowerCase());
-      const matchesTab = activeTab === 'Todos' || loan.status?.toLowerCase() === activeTab.toLowerCase();
+      const matchesSearch = loan.customers?.name
+        ?.toLowerCase()
+        .includes(search.toLowerCase());
+      const matchesTab =
+        activeTab === 'Todos' ||
+        loan.status?.toLowerCase() === activeTab.toLowerCase();
       return matchesSearch && matchesTab;
     });
   }, [search, loans, activeTab]);
@@ -150,15 +162,29 @@ export default function Loans() {
       />
 
       <View style={styles.tabsContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsScroll}>
           {STATUS_FILTERS.map(status => {
             const isActive = activeTab === status;
             return (
               <Pressable
                 key={status}
                 onPress={() => setActiveTab(status)}
-                style={[styles.tabItem, isActive && { backgroundColor: getStatusColor(status), borderColor: getStatusColor(status) }]}>
-                <CustomText text={status} weight={isActive ? 'bold' : 'regular'} color={isActive ? '#fff' : theme.colors.purpleSecondary} fontSize="sm" />
+                style={[
+                  styles.tabItem,
+                  isActive && {
+                    backgroundColor: getStatusColor(status),
+                    borderColor: getStatusColor(status),
+                  },
+                ]}>
+                <CustomText
+                  text={status}
+                  weight={isActive ? 'bold' : 'regular'}
+                  color={isActive ? '#fff' : theme.colors.purpleSecondary}
+                  fontSize="sm"
+                />
               </Pressable>
             );
           })}
@@ -170,18 +196,52 @@ export default function Loans() {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
         renderItem={({item}) => (
-          <Pressable style={[styles.loanCard, {borderLeftColor: getStatusColor(item.status)}]} onPress={() => setSelectedLoan(item)}>
-            <FontAwesome6 name="money-bill-transfer" size={20} color={theme.colors.green} />
+          <Pressable
+            style={[
+              styles.loanCard,
+              {borderLeftColor: getStatusColor(item.status)},
+            ]}
+            onPress={() => setSelectedLoan(item)}>
+            <FontAwesome6
+              name="money-bill-transfer"
+              size={20}
+              color={theme.colors.green}
+            />
             <View style={styles.infos}>
               <View style={styles.headerItem}>
-                <CustomText text={item.customers?.name ?? 'Cliente'} weight="bold" fontSize="md" />
-                <View style={[styles.tag, {backgroundColor: getStatusColor(item.status)}]}>
-                  <CustomText text={item.status ?? ''} fontSize="xs" color="#fff" weight="bold" />
+                <CustomText
+                  text={item.customers?.name ?? 'Cliente'}
+                  weight="bold"
+                  fontSize="md"
+                />
+                <View
+                  style={[
+                    styles.tag,
+                    {backgroundColor: getStatusColor(item.status)},
+                  ]}>
+                  <CustomText
+                    text={item.status ?? ''}
+                    fontSize="xs"
+                    color="#fff"
+                    weight="bold"
+                  />
                 </View>
               </View>
-              <CustomText text={formatFriendlyDate(item.created_at)} fontSize="sm" color={theme.colors.purpleSecondary} />
+              <CustomText
+                text={formatFriendlyDate(item.created_at)}
+                fontSize="sm"
+                color={theme.colors.purpleSecondary}
+              />
             </View>
-            <CustomText fontSize="md" weight="bold" text={Number(item.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} color={theme.colors.green} />
+            <CustomText
+              fontSize="md"
+              weight="bold"
+              text={Number(item.valor).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              })}
+              color={theme.colors.green}
+            />
           </Pressable>
         )}
       />
@@ -195,16 +255,25 @@ export default function Loans() {
           <Pressable style={{flex: 1}} onPress={resetAddModal} />
           <View style={styles.modalContent}>
             {/* keyboardShouldPersistTaps="handled" resolve o problema do clique no cliente */}
-            <ScrollView 
-              showsVerticalScrollIndicator={false} 
-              keyboardShouldPersistTaps="handled" 
-            >
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled">
               <View style={styles.dragIndicator} />
-              <CustomText text="Novo Empréstimo" fontSize="lg" weight="bold" style={{marginBottom: theme.spacing.sm}} />
+              <CustomText
+                text="Novo Empréstimo"
+                fontSize="lg"
+                weight="bold"
+                style={{marginBottom: theme.spacing.sm}}
+              />
 
               {!selectedCustomer ? (
                 <View>
-                  <CustomText text="Buscar Cliente (Nome ou Telefone)" fontSize="sm" weight="bold" color={theme.colors.purpleSecondary} />
+                  <CustomText
+                    text="Buscar Cliente (Nome ou Telefone)"
+                    fontSize="sm"
+                    weight="bold"
+                    color={theme.colors.purpleSecondary}
+                  />
                   <TextInput
                     placeholder="Comece a digitar..."
                     value={customerSearch}
@@ -212,30 +281,53 @@ export default function Loans() {
                     style={styles.modalInput}
                   />
                   {foundCustomers.map(c => (
-                    <Pressable 
-                      key={c.id} 
+                    <Pressable
+                      key={c.id}
                       onPress={() => {
                         setSelectedCustomer(c);
                         Keyboard.dismiss(); // Fecha o teclado ao selecionar
-                      }} 
-                      style={styles.customerResult}
-                    >
-                      <FontAwesome6 name="user" size={14} color={theme.colors.green} />
-                      <CustomText text={`${c.name} (${c.celular})`} fontSize="md" />
+                      }}
+                      style={styles.customerResult}>
+                      <FontAwesome6
+                        name="user"
+                        size={14}
+                        color={theme.colors.green}
+                      />
+                      <CustomText
+                        text={`${c.name} (${c.celular})`}
+                        fontSize="md"
+                      />
                     </Pressable>
                   ))}
                 </View>
               ) : (
                 <View style={styles.form}>
                   <View style={styles.selectedCustomerBox}>
-                    <CustomText text="Cliente Selecionado:" fontSize="xs" color={theme.colors.purpleSecondary} />
-                    <CustomText text={selectedCustomer.name ?? ''} weight="bold" fontSize="md" />
+                    <CustomText
+                      text="Cliente Selecionado:"
+                      fontSize="xs"
+                      color={theme.colors.purpleSecondary}
+                    />
+                    <CustomText
+                      text={selectedCustomer.name ?? ''}
+                      weight="bold"
+                      fontSize="md"
+                    />
                     <Pressable onPress={() => setSelectedCustomer(null)}>
-                      <CustomText text="Trocar cliente" color={theme.colors.danger} fontSize="xs" weight="bold" />
+                      <CustomText
+                        text="Trocar cliente"
+                        color={theme.colors.danger}
+                        fontSize="xs"
+                        weight="bold"
+                      />
                     </Pressable>
                   </View>
 
-                  <CustomText text="Valor (R$)" fontSize="xs" color={theme.colors.purpleSecondary} />
+                  <CustomText
+                    text="Valor (R$)"
+                    fontSize="xs"
+                    color={theme.colors.purpleSecondary}
+                  />
                   <TextInput
                     placeholder="0,00"
                     keyboardType="numeric"
@@ -244,7 +336,11 @@ export default function Loans() {
                     style={styles.modalInput}
                   />
 
-                  <CustomText text="Juros mensais (%)" fontSize="xs" color={theme.colors.purpleSecondary} />
+                  <CustomText
+                    text="Juros mensais (%)"
+                    fontSize="xs"
+                    color={theme.colors.purpleSecondary}
+                  />
                   <TextInput
                     placeholder="Ex: 10"
                     keyboardType="numeric"
@@ -254,7 +350,12 @@ export default function Loans() {
                   />
 
                   {/* Campo de Cobrança adicionado */}
-                  <CustomText text="Frequência de cobrança" fontSize="xs" weight="bold" color={theme.colors.purpleSecondary} />
+                  <CustomText
+                    text="Frequência de cobrança"
+                    fontSize="xs"
+                    weight="bold"
+                    color={theme.colors.purpleSecondary}
+                  />
                   <View style={styles.tabsRow}>
                     {COBRANCA_OPTIONS.map(f => (
                       <Pressable
@@ -262,12 +363,18 @@ export default function Loans() {
                         onPress={() => setLoanForm({...loanForm, cobranca: f})}
                         style={[
                           styles.tabItemForm,
-                          loanForm.cobranca === f && { backgroundColor: theme.colors.green, borderColor: theme.colors.green }
-                        ]}
-                      >
-                        <CustomText 
-                          text={f.charAt(0).toUpperCase() + f.slice(1)} 
-                          color={loanForm.cobranca === f ? "#fff" : theme.colors.purpleSecondary}
+                          loanForm.cobranca === f && {
+                            backgroundColor: theme.colors.green,
+                            borderColor: theme.colors.green,
+                          },
+                        ]}>
+                        <CustomText
+                          text={f.charAt(0).toUpperCase() + f.slice(1)}
+                          color={
+                            loanForm.cobranca === f
+                              ? '#fff'
+                              : theme.colors.purpleSecondary
+                          }
                           fontSize="xs"
                           weight="bold"
                         />
@@ -278,7 +385,13 @@ export default function Loans() {
                   <CustomButton text="Emprestar" onPress={handleCreateLoan} />
                 </View>
               )}
-              <CustomButton text="Cancelar" onPress={resetAddModal} backgroundColor="transparent" textColor={theme.colors.danger} style={{marginTop: 10}} />
+              <CustomButton
+                text="Cancelar"
+                onPress={resetAddModal}
+                backgroundColor="transparent"
+                textColor={theme.colors.danger}
+                style={{marginTop: 10}}
+              />
             </ScrollView>
           </View>
         </View>
@@ -292,12 +405,35 @@ export default function Loans() {
             {selectedLoan && (
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.dragIndicator} />
-                <CustomText text="Detalhes do Empréstimo" fontSize="lg" weight="bold" />
-                <View style={styles.detailRow}><CustomText text="Cliente:" weight="bold" /><CustomText text={selectedLoan.customers?.name ?? 'N/A'} /></View>
-                <View style={styles.detailRow}><CustomText text="Data:" weight="bold" /><CustomText text={formatFriendlyDate(selectedLoan.created_at)} /></View>
-                <View style={styles.detailRow}><CustomText text="Valor:" weight="bold" /><CustomText text={`R$ ${Number(selectedLoan.valor).toFixed(2)}`} /></View>
-                <View style={styles.detailRow}><CustomText text="Cobrança:" weight="bold" /><CustomText text={selectedLoan.cobranca ?? 'N/A'} /></View>
-                <CustomButton onPress={() => setSelectedLoan(null)} text="Fechar" />
+                <CustomText
+                  text="Detalhes do Empréstimo"
+                  fontSize="lg"
+                  weight="bold"
+                />
+                <View style={styles.detailRow}>
+                  <CustomText text="Cliente:" weight="bold" />
+                  <CustomText text={selectedLoan.customers?.name ?? 'N/A'} />
+                </View>
+                <View style={styles.detailRow}>
+                  <CustomText text="Data:" weight="bold" />
+                  <CustomText
+                    text={formatFriendlyDate(selectedLoan.created_at)}
+                  />
+                </View>
+                <View style={styles.detailRow}>
+                  <CustomText text="Valor:" weight="bold" />
+                  <CustomText
+                    text={`R$ ${Number(selectedLoan.valor).toFixed(2)}`}
+                  />
+                </View>
+                <View style={styles.detailRow}>
+                  <CustomText text="Cobrança:" weight="bold" />
+                  <CustomText text={selectedLoan.cobranca ?? 'N/A'} />
+                </View>
+                <CustomButton
+                  onPress={() => setSelectedLoan(null)}
+                  text="Fechar"
+                />
               </ScrollView>
             )}
           </View>
@@ -308,55 +444,119 @@ export default function Loans() {
 }
 
 const styles = StyleSheet.create({
-  mainContainer: { flex: 1, padding: theme.spacing.md },
+  mainContainer: {flex: 1, padding: theme.spacing.md},
   searchInput: {
-    backgroundColor: '#fff', padding: 14, borderRadius: theme.borderRadius.md, marginBottom: 12, elevation: 2,
+    backgroundColor: '#fff',
+    padding: 14,
+    borderRadius: theme.borderRadius.md,
+    marginBottom: 12,
+    elevation: 2,
   },
-  tabsContainer: { marginBottom: 16 },
-  tabsScroll: { gap: 8, paddingVertical: 4 },
+  tabsContainer: {marginBottom: 16},
+  tabsScroll: {gap: 8, paddingVertical: 4},
   tabItem: {
-    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: '#fff',
-    borderWidth: 1, borderColor: '#E0E0E0', justifyContent: 'center', alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  listContent: { paddingBottom: 80 },
+  listContent: {paddingBottom: 80},
   loanCard: {
-    backgroundColor: '#fff', borderRadius: theme.borderRadius.lg, paddingHorizontal: 16, paddingVertical: 14,
-    flexDirection: 'row', alignItems: 'center', gap: 12, borderLeftWidth: 6, marginBottom: 12,
+    backgroundColor: '#fff',
+    borderRadius: theme.borderRadius.lg,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    borderLeftWidth: 6,
+    marginBottom: 12,
     elevation: 3,
   },
   infos: {flex: 1, gap: 2},
   headerItem: {flexDirection: 'row', alignItems: 'center', gap: 8},
   tag: {paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6},
   fab: {
-    position: 'absolute', bottom: 24, right: 24, backgroundColor: theme.colors.green,
-    width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', elevation: 8,
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    backgroundColor: theme.colors.green,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
   },
-  modalWrapper: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.2)' },
+  modalWrapper: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
   modalContent: {
-    backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24,
-    maxHeight: '90%', width: '100%', elevation: 25,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 24,
+    maxHeight: '90%',
+    width: '100%',
+    elevation: 25,
   },
-  dragIndicator: { width: 40, height: 5, backgroundColor: '#e0e0e0', borderRadius: 3, alignSelf: 'center', marginBottom: 15 },
+  dragIndicator: {
+    width: 40,
+    height: 5,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginBottom: 15,
+  },
   modalInput: {
-    borderBottomWidth: 1, borderBottomColor: theme.colors.green, paddingVertical: 10,
-    fontSize: 16, marginBottom: 20, color: '#333',
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.green,
+    paddingVertical: 10,
+    fontSize: 16,
+    marginBottom: 20,
+    color: '#333',
   },
   customerResult: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 15,
-    borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   selectedCustomerBox: {
-    backgroundColor: theme.colors.page, padding: theme.spacing.md, borderRadius: theme.borderRadius.lg, gap: theme.spacing.sm,
-    marginBottom: theme.spacing.md
+    backgroundColor: theme.colors.page,
+    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
   },
   tabsRow: {
-    flexDirection: 'row', gap: 8,
-    marginBottom: theme.spacing.sm
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: theme.spacing.sm,
   },
   tabItemForm: {
-    flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#F8F9FA',
-    borderWidth: 1, borderColor: '#E0E0E0', alignItems: 'center',
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#F8F9FA',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    alignItems: 'center',
   },
-  detailRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  form: { gap: 5 }
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  form: {gap: 5},
 });

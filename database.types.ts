@@ -17,10 +17,10 @@ export type Database = {
       customers: {
         Row: {
           address: string | null;
-          celular: string | null;
+          celular: string;
           cpf: string | null;
           created_at: string;
-          email: string;
+          email: string | null;
           id: string;
           name: string;
           referencia: string | null;
@@ -28,10 +28,10 @@ export type Database = {
         };
         Insert: {
           address?: string | null;
-          celular?: string | null;
+          celular: string;
           cpf?: string | null;
           created_at?: string;
-          email: string;
+          email?: string | null;
           id?: string;
           name: string;
           referencia?: string | null;
@@ -39,10 +39,10 @@ export type Database = {
         };
         Update: {
           address?: string | null;
-          celular?: string | null;
+          celular?: string;
           cpf?: string | null;
           created_at?: string;
-          email?: string;
+          email?: string | null;
           id?: string;
           name?: string;
           referencia?: string | null;
