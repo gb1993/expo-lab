@@ -129,7 +129,6 @@ export default function Customers() {
 
   function getStatusColor(status: string | null) {
     switch (status?.toLowerCase()) {
-      case 'pendente':
       case 'ativo':
         return theme.colors.alert;
       case 'finalizado':

@@ -61,7 +61,6 @@ export default function CreateLoan() {
       valor: parseFloat(valor.replace(',', '.')),
       juros: parseFloat(juros.replace(',', '.')) / 100,
       cobranca: cobranca, // Enviando para a coluna correta
-      status: 'pendente',
     };
 
     setLoading(true);
