@@ -22,11 +22,20 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.gabrielsbranco.finapp"
     },
     "web": {
       "favicon": "./assets/brand-welcome.png"
     },
-    "plugins": ["expo-font", "expo-splash-screen"]
+    "plugins": [
+      "expo-font",
+      "expo-splash-screen"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cde681f5-fbcf-497a-9589-25216661b980"
+      }
+    }
   }
 }
