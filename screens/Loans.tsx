@@ -2,7 +2,6 @@ import {useEffect, useMemo, useState} from 'react';
 import {
   View,
   FlatList,
-  ActivityIndicator,
   TextInput,
   StyleSheet,
   Pressable,
@@ -12,7 +11,7 @@ import {
   Keyboard,
 } from 'react-native';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import {format, parseISO} from 'date-fns';
+import {format, parseISO, addMonths, addWeeks, addDays} from 'date-fns';
 import {ptBR} from 'date-fns/locale';
 
 import {supabase} from '../lib/supabase';
@@ -29,7 +28,7 @@ type LoanWithCustomer = LoanRow & {
   customers: Pick<CustomerRow, 'name'> | null;
 };
 
-const STATUS_FILTERS = ['Todos', 'Ativo', 'Atrasado', 'Finalizado'];
+const STATUS_FILTERS = ['Todos', 'Ativo', 'Atrasado', 'Finalizado', 'Acordo'];
 const COBRANCA_OPTIONS = ['semanal', 'quinzenal', 'mensal'] as const;
 
 export default function Loans() {
@@ -52,7 +51,23 @@ export default function Loans() {
     valor: '',
     juros: '',
     cobranca: 'mensal' as 'semanal' | 'quinzenal' | 'mensal',
+    data_vencimento: format(addMonths(new Date(), 1), 'yyyy-MM-dd'),
+    data_vencimento_display: format(addMonths(new Date(), 1), 'dd/MM/yyyy'),
   });
+
+  function handleCobrancaChange(cobranca: 'semanal' | 'quinzenal' | 'mensal') {
+    let newDate = new Date();
+    if (cobranca === 'semanal') newDate = addWeeks(newDate, 1);
+    else if (cobranca === 'quinzenal') newDate = addDays(newDate, 15);
+    else if (cobranca === 'mensal') newDate = addMonths(newDate, 1);
+
+    setLoanForm({
+      ...loanForm,
+      cobranca,
+      data_vencimento: format(newDate, 'yyyy-MM-dd'),
+      data_vencimento_display: format(newDate, 'dd/MM/yyyy'),
+    });
+  }
 
   useEffect(() => {
     fetchLoans();
@@ -97,6 +112,7 @@ export default function Loans() {
       valor: parseFloat(loanForm.valor.replace(',', '.')),
       juros: parseFloat(loanForm.juros.replace(',', '.')) / 100,
       cobranca: loanForm.cobranca,
+      data_vencimento: loanForm.data_vencimento,
       status: 'ativo',
     };
 
@@ -115,7 +131,13 @@ export default function Loans() {
     setIsAddModalVisible(false);
     setSelectedCustomer(null);
     setCustomerSearch('');
-    setLoanForm({valor: '', juros: '', cobranca: 'mensal'});
+    setLoanForm({
+      valor: '',
+      juros: '',
+      cobranca: 'mensal',
+      data_vencimento: format(addMonths(new Date(), 1), 'yyyy-MM-dd'),
+      data_vencimento_display: format(addMonths(new Date(), 1), 'dd/MM/yyyy'),
+    });
   }
 
   const formatFriendlyDate = (dateString: string) => {
@@ -134,6 +156,8 @@ export default function Loans() {
         return theme.colors.success;
       case 'atrasado':
         return theme.colors.danger;
+      case 'acordo':
+        return theme.colors.primary; // Usa a cor principal para acordos
       default:
         return theme.colors.purpleSecondary;
     }
@@ -360,7 +384,7 @@ export default function Loans() {
                     {COBRANCA_OPTIONS.map(f => (
                       <Pressable
                         key={f}
-                        onPress={() => setLoanForm({...loanForm, cobranca: f})}
+                        onPress={() => handleCobrancaChange(f)}
                         style={[
                           styles.tabItemForm,
                           loanForm.cobranca === f && {
@@ -381,6 +405,42 @@ export default function Loans() {
                       </Pressable>
                     ))}
                   </View>
+
+                  <CustomText
+                    text="Data Primeiro Pagamento (DD/MM/YYYY)"
+                    fontSize="xs"
+                    color={theme.colors.purpleSecondary}
+                  />
+                  <TextInput
+                    placeholder="DD/MM/YYYY"
+                    value={loanForm.data_vencimento_display}
+                    onChangeText={t => {
+                      let formatted = t.replace(/\D/g, '');
+                      if (formatted.length > 2) {
+                        formatted =
+                          formatted.slice(0, 2) + '/' + formatted.slice(2);
+                      }
+                      if (formatted.length > 5) {
+                        formatted =
+                          formatted.slice(0, 5) + '/' + formatted.slice(5, 9);
+                      }
+
+                      let isoDate = loanForm.data_vencimento;
+                      if (formatted.length === 10) {
+                        const [d, m, y] = formatted.split('/');
+                        isoDate = `${y}-${m}-${d}`;
+                      }
+
+                      setLoanForm({
+                        ...loanForm,
+                        data_vencimento_display: formatted,
+                        data_vencimento: isoDate,
+                      });
+                    }}
+                    keyboardType="number-pad"
+                    maxLength={10}
+                    style={styles.modalInput}
+                  />
 
                   <CustomButton text="Emprestar" onPress={handleCreateLoan} />
                 </View>
@@ -430,6 +490,12 @@ export default function Loans() {
                   <CustomText text="Cobrança:" weight="bold" />
                   <CustomText text={selectedLoan.cobranca ?? 'N/A'} />
                 </View>
+                {selectedLoan.data_vencimento && (
+                  <View style={styles.detailRow}>
+                    <CustomText text="Próx. Vencimento:" weight="bold" />
+                    <CustomText text={formatFriendlyDate(selectedLoan.data_vencimento)} />
+                  </View>
+                )}
                 <CustomButton
                   onPress={() => setSelectedLoan(null)}
                   text="Fechar"

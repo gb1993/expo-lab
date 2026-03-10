@@ -22,6 +22,16 @@ export default function DefaultNavigation() {
         backgroundColor={theme.colors.secondary}
         widthVariant={52}
         heightVariant={52}
+        iconName="handshake"
+        IconLibrary={MaterialIcons}
+        iconColor={theme.colors.primary}
+        iconSize={30}
+        onPress={() => navigation.navigate('main', {screen: 'agreements'})}
+      />
+      <CustomButton
+        backgroundColor={theme.colors.secondary}
+        widthVariant={52}
+        heightVariant={52}
         iconName="person-search"
         iconColor={theme.colors.primary}
         iconSize={30}
@@ -51,7 +61,7 @@ export default function DefaultNavigation() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: theme.spacing.xxl,
+    paddingHorizontal: theme.spacing.md,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -11,6 +11,7 @@ import SignUp from './screens/SignUp';
 import DashBoard from './screens/DashBoard';
 import Customers from './screens/Customers';
 import Loans from './screens/Loans';
+import Agreement from './screens/Agreement';
 import MyAccount from './screens/MyAccount';
 
 import ScreenContainer from './components/ScreenContainer';
@@ -32,6 +33,7 @@ function MainStack() {
         <Stack.Screen name="dashboard" component={DashBoard} />
         <Stack.Screen name="customers" component={Customers} />
         <Stack.Screen name="loans" component={Loans} />
+        <Stack.Screen name="agreements" component={Agreement} />
         <Stack.Screen name="myAccount" component={MyAccount} />
       </Stack.Navigator>
       <DefaultNavigation />

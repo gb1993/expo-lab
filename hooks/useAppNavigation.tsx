@@ -8,6 +8,7 @@ type MainStackParamList = {
   dashboard: undefined;
   customers: undefined;
   loans: undefined;
+  agreements: undefined;
   myAccount: undefined;
   // Definimos que CreateLoan pode receber um customerId
   CreateLoan: {customerId?: string};
