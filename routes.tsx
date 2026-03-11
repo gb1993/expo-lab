@@ -13,6 +13,7 @@ import Customers from './screens/Customers';
 import Loans from './screens/Loans';
 import Agreement from './screens/Agreement';
 import MyAccount from './screens/MyAccount';
+import Legal from './screens/Legal';
 
 import ScreenContainer from './components/ScreenContainer';
 import DefaultNavigation from './components/DefaultNavigation';
@@ -59,6 +60,7 @@ function RootStack() {
         component={CreateLoan}
         options={{title: 'Novo Empréstimo'}}
       />
+      <Stack.Screen name="legal" component={Legal} options={{title: 'Termos e Políticas'}} />
       <Stack.Screen name="main" component={MainStack} />
     </Stack.Navigator>
   );
@@ -69,6 +71,7 @@ function LoginStack() {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="login" component={Login} />
       <Stack.Screen name="signUp" component={SignUp} />
+      <Stack.Screen name="legal" component={Legal} options={{title: 'Termos e Políticas'}} />
     </Stack.Navigator>
   );
 }

@@ -19,6 +19,7 @@ import {supabase} from '../lib/supabase';
 type AuthStackParamList = {
   login: undefined;
   signUp: undefined;
+  legal: undefined;
 };
 
 /** Regras: 8+ caracteres, letras, números e pelo menos um caractere especial. */
@@ -49,6 +50,7 @@ export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{
     type: 'success' | 'error';
@@ -89,6 +91,10 @@ export default function SignUp() {
   }
 
   async function handleSignUp() {
+    if (!termsAccepted) {
+      setMessage({type: 'error', text: 'Você precisa aceitar os Termos e Políticas para criar uma conta.'});
+      return;
+    }
     if (!email.trim() || !password) {
       setMessage({type: 'error', text: 'Preencha email e senha.'});
       return;
@@ -286,6 +292,21 @@ export default function SignUp() {
             </Pressable>
           )}
 
+          <Pressable
+            style={styles.checkboxContainer}
+            onPress={() => setTermsAccepted(!termsAccepted)}
+            disabled={loading}>
+            <View style={[styles.checkbox, termsAccepted && styles.checkboxSelected]}>
+              {termsAccepted && <CustomText fontSize="xs" text="✓" color="#fff" style={styles.checkmark} />}
+            </View>
+            <View style={styles.termsTextContainer}>
+              <CustomText fontSize="sm" text="Li e concordo com os " color={theme.colors.primary} />
+              <Pressable onPress={() => navigation.navigate('legal')}>
+                <CustomText fontSize="sm" text="Termos de Uso, Contrato, LGPD e Aviso Legal" color={theme.colors.primary} style={styles.termsLink} />
+              </Pressable>
+            </View>
+          </Pressable>
+
           <CustomButton
             text="Criar conta"
             onPress={handleSignUp}
@@ -365,5 +386,37 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     alignItems: 'center',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1.5,
+    borderColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  checkboxSelected: {
+    backgroundColor: theme.colors.primary,
+  },
+  checkmark: {
+    lineHeight: 18,
+  },
+  termsTextContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  termsLink: {
+    textDecorationLine: 'underline',
+    fontWeight: 'bold',
   },
 });

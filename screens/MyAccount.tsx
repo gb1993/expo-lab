@@ -1,4 +1,5 @@
 import {Alert, StyleSheet, View} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import CustomText from '../components/CustomText';
 import CustomButton from '../components/CustomButton';
 import {useAuthContext} from '../hooks/useAuthContext';
@@ -6,6 +7,7 @@ import {supabase} from '../lib/supabase';
 import {theme} from '../themes';
 
 export default function MyAccount() {
+  const navigation = useNavigation<any>();
   const {session} = useAuthContext();
   const email = session?.user?.email ?? '';
   const name =
@@ -43,7 +45,11 @@ export default function MyAccount() {
         />
         <CustomText fontSize="md" text={email} color={theme.colors.primary} />
       </View>
-      <CustomButton text="Sair" onPress={handleSignOut} />
+      <View style={styles.actions}>
+        <CustomButton text="Ler Termos e Políticas" onPress={() => navigation.navigate('legal')} />
+        <View style={{height: theme.spacing.md}} />
+        <CustomButton text="Sair" onPress={handleSignOut} />
+      </View>
     </View>
   );
 }
@@ -58,6 +64,9 @@ const styles = StyleSheet.create({
     marginVertical: theme.spacing.lg,
   },
   labelTop: {
+    marginTop: theme.spacing.md,
+  },
+  actions: {
     marginTop: theme.spacing.md,
   },
 });
