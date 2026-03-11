@@ -104,6 +104,23 @@ export default function SignUp() {
     }
     setLoading(true);
     setMessage(null);
+
+    const { data: emailExistsData, error: emailExistsError } = await supabase.rpc('check_email_exists', {
+      email_to_check: email.trim(),
+    });
+
+    if (emailExistsError) {
+      setLoading(false);
+      setMessage({type: 'error', text: 'Erro ao verificar email. Tente novamente.'});
+      return;
+    }
+
+    if (emailExistsData === true) {
+      setLoading(false);
+      setMessage({type: 'error', text: 'Este email já está cadastrado.'});
+      return;
+    }
+
     const {data, error} = await supabase.auth.signUp({
       email: email.trim(),
       password,

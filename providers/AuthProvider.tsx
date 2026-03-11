@@ -29,7 +29,21 @@ export default function AuthProvider({children}: PropsWithChildren) {
         error,
       } = await supabase.auth.getSession();
       if (error) console.error('Erro ao carregar sessão:', error);
-      setSession(currentSession);
+
+      let finalSession = currentSession;
+      if (currentSession?.user) {
+        const {data: profile} = await supabase
+          .from('profiles')
+          .select('is_active')
+          .eq('id', currentSession.user.id)
+          .single();
+        if (profile && profile.is_active === false) {
+          await supabase.auth.signOut();
+          finalSession = null;
+        }
+      }
+
+      setSession(finalSession);
       setIsLoading(false);
     };
 
@@ -41,8 +55,36 @@ export default function AuthProvider({children}: PropsWithChildren) {
       setSession(newSession);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const channel = supabase
+      .channel(`profile_status_${session.user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${session.user.id}`,
+        },
+        async payload => {
+          if (payload.new && payload.new.is_active === false) {
+            await supabase.auth.signOut();
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user?.id]);
 
   useEffect(() => {
     const handleDeepLink = async (url: string | null) => {

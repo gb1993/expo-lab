@@ -43,6 +43,22 @@ export default function Login() {
       email: email.trim(),
       password,
     });
+
+    if (data?.session) {
+      const {data: profile} = await supabase
+        .from('profiles')
+        .select('is_active')
+        .eq('id', data.session.user.id)
+        .single();
+        
+      if (profile && profile.is_active === false) {
+        await supabase.auth.signOut();
+        setLoading(false);
+        setMessage({type: 'error', text: 'Sua conta foi desativada.'});
+        return;
+      }
+    }
+
     setLoading(false);
     if (error) {
       setMessage({type: 'error', text: error.message});
