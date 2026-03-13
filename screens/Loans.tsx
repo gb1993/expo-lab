@@ -19,10 +19,13 @@ import {Database} from '../database.types';
 import {theme} from '../themes';
 import CustomText from '../components/CustomText';
 import CustomButton from '../components/CustomButton';
+import PaymentModal from '../components/PaymentModal';
+import {useAppNavigation} from '../hooks/useAppNavigation';
 
 type LoanRow = Database['public']['Tables']['loans']['Row'];
 type CustomerRow = Database['public']['Tables']['customers']['Row'];
 type LoanInsert = Database['public']['Tables']['loans']['Insert'];
+type AgreementRow = Database['public']['Tables']['agreements']['Row'];
 
 type LoanWithCustomer = LoanRow & {
   customers: Pick<CustomerRow, 'name'> | null;
@@ -32,6 +35,7 @@ const STATUS_FILTERS = ['Todos', 'Ativo', 'Atrasado', 'Finalizado', 'Acordo'];
 const COBRANCA_OPTIONS = ['semanal', 'quinzenal', 'mensal'] as const;
 
 export default function Loans() {
+  const navigation = useAppNavigation();
   const [loans, setLoans] = useState<LoanWithCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -39,6 +43,9 @@ export default function Loans() {
   const [selectedLoan, setSelectedLoan] = useState<LoanWithCustomer | null>(
     null,
   );
+  const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
+  const [currentDebt, setCurrentDebt] = useState(0);
+  const [selectedAgreement, setSelectedAgreement] = useState<AgreementRow | null>(null);
 
   // Estados para o Novo Empréstimo
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -145,6 +152,14 @@ export default function Loans() {
       return format(parseISO(dateString), 'dd/MM/yyyy HH:mm', {locale: ptBR});
     } catch (e) {
       return 'Data inválida';
+    }
+  };
+
+  const formatSimpleDate = (dateString: string) => {
+    try {
+      return format(parseISO(dateString), 'dd/MM/yyyy', {locale: ptBR});
+    } catch (e) {
+      return dateString;
     }
   };
 
@@ -460,7 +475,6 @@ export default function Loans() {
       {/* Modal de Detalhes */}
       <Modal visible={!!selectedLoan} animationType="slide" transparent>
         <View style={styles.modalWrapper}>
-          <CustomButton onPress={() => setSelectedLoan(null)} />
           <View style={styles.modalContent}>
             {selectedLoan && (
               <ScrollView showsVerticalScrollIndicator={false}>
@@ -496,6 +510,42 @@ export default function Loans() {
                     <CustomText text={formatFriendlyDate(selectedLoan.data_vencimento)} />
                   </View>
                 )}
+                {(selectedLoan.status === 'ativo' || selectedLoan.status === 'atrasado') && (
+                  <CustomButton
+                    text="Registrar Pagamento"
+                    onPress={async () => {
+                      // Calcula saldo devedor: valor + juros - pagamentos
+                      const totalWithInterest = selectedLoan.valor + (selectedLoan.valor * selectedLoan.juros);
+                      const {data: payments} = await supabase
+                        .from('payments')
+                        .select('valor')
+                        .eq('loan_id', selectedLoan.id);
+                      const totalPaid = payments?.reduce((sum, p) => sum + Number(p.valor), 0) ?? 0;
+                      setCurrentDebt(totalWithInterest - totalPaid);
+                      setIsPaymentModalVisible(true);
+                    }}
+                    backgroundColor={theme.colors.green}
+                  />
+                )}
+                {selectedLoan.status === 'acordo' && (
+                  <CustomButton
+                    text="Ver Acordo"
+                    onPress={async () => {
+                      const {data} = await supabase
+                        .from('agreements')
+                        .select('*')
+                        .eq('loan_id', selectedLoan.id)
+                        .limit(1)
+                        .single();
+                      if (data) {
+                        setSelectedAgreement(data);
+                      } else {
+                        Alert.alert('Aviso', 'Acordo não encontrado para este empréstimo.');
+                      }
+                    }}
+                    backgroundColor={theme.colors.primary}
+                  />
+                )}
                 <CustomButton
                   onPress={() => setSelectedLoan(null)}
                   text="Fechar"
@@ -505,6 +555,92 @@ export default function Loans() {
           </View>
         </View>
       </Modal>
+
+      {/* Modal Detalhes do Acordo */}
+      <Modal visible={!!selectedAgreement} animationType="slide" transparent>
+        <View style={styles.modalWrapper}>
+          <Pressable style={{flex: 1}} onPress={() => setSelectedAgreement(null)} />
+          <View style={styles.modalContent}>
+            {selectedAgreement && (
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.dragIndicator} />
+                <CustomText
+                  text="Detalhes do Acordo"
+                  fontSize="lg"
+                  weight="bold"
+                />
+                <View style={styles.detailRow}>
+                  <CustomText text="Data do Acordo:" weight="bold" />
+                  <CustomText
+                    text={formatSimpleDate(selectedAgreement.data_acordo)}
+                  />
+                </View>
+                <View style={styles.detailRow}>
+                  <CustomText text="Valor Acordado:" weight="bold" />
+                  <CustomText
+                    text={`R$ ${Number(selectedAgreement.valor).toFixed(2)}`}
+                  />
+                </View>
+                <View style={styles.detailRow}>
+                  <CustomText text="Registrado em:" weight="bold" />
+                  <CustomText
+                    text={formatFriendlyDate(selectedAgreement.created_at)}
+                  />
+                </View>
+                <CustomButton
+                  text="Registrar Pagamento"
+                  onPress={async () => {
+                    const {data: payments} = await supabase
+                      .from('payments')
+                      .select('valor')
+                      .eq('agreement_id', selectedAgreement.id);
+                    const totalPaid = payments?.reduce((sum, p) => sum + Number(p.valor), 0) ?? 0;
+                    setCurrentDebt(selectedAgreement.valor - totalPaid);
+                    setIsPaymentModalVisible(true);
+                  }}
+                  backgroundColor={theme.colors.green}
+                />
+                <CustomButton
+                  onPress={() => setSelectedAgreement(null)}
+                  text="Fechar"
+                />
+              </ScrollView>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {selectedLoan && (
+        <PaymentModal
+          visible={isPaymentModalVisible}
+          onClose={() => setIsPaymentModalVisible(false)}
+          onSuccess={() => {
+            setIsPaymentModalVisible(false);
+            setSelectedLoan(null);
+            fetchLoans();
+          }}
+          loanId={selectedLoan.id}
+          customerId={selectedLoan.customer_id}
+          currentDebt={currentDebt}
+        />
+      )}
+
+      {selectedAgreement && (
+        <PaymentModal
+          visible={isPaymentModalVisible && !!selectedAgreement && !selectedLoan}
+          onClose={() => setIsPaymentModalVisible(false)}
+          onSuccess={() => {
+            setIsPaymentModalVisible(false);
+            setSelectedAgreement(null);
+            setSelectedLoan(null);
+            fetchLoans();
+          }}
+          loanId={selectedAgreement.loan_id}
+          agreementId={selectedAgreement.id}
+          customerId={selectedAgreement.customer_id}
+          currentDebt={currentDebt}
+        />
+      )}
     </View>
   );
 }

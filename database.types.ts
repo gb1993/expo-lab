@@ -46,6 +46,7 @@ export type Database = {
           data_acordo: string
           id: string
           loan_id: string
+          status: Database["public"]["Enums"]["status_tipo"]
           valor: number
         }
         Insert: {
@@ -54,6 +55,7 @@ export type Database = {
           data_acordo: string
           id?: string
           loan_id: string
+          status?: Database["public"]["Enums"]["status_tipo"]
           valor: number
         }
         Update: {
@@ -62,6 +64,7 @@ export type Database = {
           data_acordo?: string
           id?: string
           loan_id?: string
+          status?: Database["public"]["Enums"]["status_tipo"]
           valor?: number
         }
         Relationships: [
@@ -157,6 +160,55 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          agreement_id: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          loan_id: string
+          valor: number
+        }
+        Insert: {
+          agreement_id?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          loan_id: string
+          valor: number
+        }
+        Update: {
+          agreement_id?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          loan_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "agreements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_loan_id_fkey"
+            columns: ["loan_id"]
+            isOneToOne: false
+            referencedRelation: "loans"
             referencedColumns: ["id"]
           },
         ]

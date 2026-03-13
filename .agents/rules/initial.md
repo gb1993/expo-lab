@@ -8,3 +8,4 @@ trigger: always_on
 4. Qualquer alteração no supabase deve ser realizada através de uma migration.
 5. Sempre certifique-se de respeitar o RLS.
 6. Sempre usar npx supabase gen types typescript --linked > database.types.ts para recriar os types após executar uma migration.
+7. Nunca use <CustomButton /> com o atributo styles

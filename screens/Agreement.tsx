@@ -20,6 +20,7 @@ import {Database} from '../database.types';
 import {theme} from '../themes';
 import CustomText from '../components/CustomText';
 import CustomButton from '../components/CustomButton';
+import PaymentModal from '../components/PaymentModal';
 
 type AgreementRow = Database['public']['Tables']['agreements']['Row'];
 type CustomerRow = Database['public']['Tables']['customers']['Row'];
@@ -31,12 +32,17 @@ type AgreementWithRelations = AgreementRow & {
   loans: Pick<LoanRow, 'valor' | 'status' | 'created_at'> | null;
 };
 
+const STATUS_FILTERS = ['Todos', 'Ativo', 'Atrasado', 'Finalizado'];
+
 export default function Agreement() {
   const [agreements, setAgreements] = useState<AgreementWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('Todos');
   const [selectedAgreement, setSelectedAgreement] =
     useState<AgreementWithRelations | null>(null);
+  const [isPaymentModalVisible, setIsPaymentModalVisible] = useState(false);
+  const [currentDebt, setCurrentDebt] = useState(0);
 
   // Modal State
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
@@ -176,13 +182,30 @@ export default function Agreement() {
     }
   };
 
+  function getStatusColor(status: string | null) {
+    switch (status?.toLowerCase()) {
+      case 'ativo':
+        return theme.colors.alert;
+      case 'finalizado':
+        return theme.colors.success;
+      case 'atrasado':
+        return theme.colors.danger;
+      default:
+        return theme.colors.purpleSecondary;
+    }
+  }
+
   const filteredAgreements = useMemo(() => {
     return agreements.filter((agreement) => {
-      return agreement.customers?.name
+      const matchesSearch = agreement.customers?.name
         ?.toLowerCase()
         .includes(search.toLowerCase());
+      const matchesTab =
+        activeTab === 'Todos' ||
+        agreement.status?.toLowerCase() === activeTab.toLowerCase();
+      return matchesSearch && matchesTab;
     });
-  }, [search, agreements]);
+  }, [search, agreements, activeTab]);
 
   return (
     <View style={styles.mainContainer}>
@@ -194,13 +217,43 @@ export default function Agreement() {
         style={styles.searchInput}
       />
 
+      <View style={styles.tabsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsScroll}>
+          {STATUS_FILTERS.map(status => {
+            const isActive = activeTab === status;
+            return (
+              <Pressable
+                key={status}
+                onPress={() => setActiveTab(status)}
+                style={[
+                  styles.tabItem,
+                  isActive && {
+                    backgroundColor: getStatusColor(status),
+                    borderColor: getStatusColor(status),
+                  },
+                ]}>
+                <CustomText
+                  text={status}
+                  weight={isActive ? 'bold' : 'regular'}
+                  color={isActive ? '#fff' : theme.colors.purpleSecondary}
+                  fontSize="sm"
+                />
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
+
       <FlatList
         data={filteredAgreements}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         renderItem={({item}) => (
           <Pressable
-            style={styles.card}
+            style={[styles.card, {borderLeftColor: getStatusColor(item.status)}]}
             onPress={() => setSelectedAgreement(item)}>
             <FontAwesome6
               name="handshake"
@@ -214,6 +267,18 @@ export default function Agreement() {
                   weight="bold"
                   fontSize="md"
                 />
+                <View
+                  style={[
+                    styles.tag,
+                    {backgroundColor: getStatusColor(item.status)},
+                  ]}>
+                  <CustomText
+                    text={item.status ?? ''}
+                    fontSize="xs"
+                    color="#fff"
+                    weight="bold"
+                  />
+                </View>
               </View>
               <CustomText
                 text={`Acordo em ${formatSimpleDate(item.data_acordo)}`}
@@ -454,7 +519,6 @@ export default function Agreement() {
       {/* Modal Detalhes */}
       <Modal visible={!!selectedAgreement} animationType="slide" transparent>
         <View style={styles.modalWrapper}>
-          <CustomButton onPress={() => setSelectedAgreement(null)} />
           <View style={styles.modalContent}>
             {selectedAgreement && (
               <ScrollView showsVerticalScrollIndicator={false}>
@@ -497,6 +561,20 @@ export default function Agreement() {
                   />
                 </View>
                 <CustomButton
+                  text="Registrar Pagamento"
+                  onPress={async () => {
+                    // Saldo devedor do acordo = valor acordo - pagamentos já feitos
+                    const {data: payments} = await supabase
+                      .from('payments')
+                      .select('valor')
+                      .eq('agreement_id', selectedAgreement.id);
+                    const totalPaid = payments?.reduce((sum, p) => sum + Number(p.valor), 0) ?? 0;
+                    setCurrentDebt(selectedAgreement.valor - totalPaid);
+                    setIsPaymentModalVisible(true);
+                  }}
+                  backgroundColor={theme.colors.green}
+                />
+                <CustomButton
                   onPress={() => setSelectedAgreement(null)}
                   text="Fechar"
                 />
@@ -505,6 +583,22 @@ export default function Agreement() {
           </View>
         </View>
       </Modal>
+
+      {selectedAgreement && (
+        <PaymentModal
+          visible={isPaymentModalVisible}
+          onClose={() => setIsPaymentModalVisible(false)}
+          onSuccess={() => {
+            setIsPaymentModalVisible(false);
+            setSelectedAgreement(null);
+            fetchAgreements();
+          }}
+          loanId={selectedAgreement.loan_id}
+          agreementId={selectedAgreement.id}
+          customerId={selectedAgreement.customer_id}
+          currentDebt={currentDebt}
+        />
+      )}
     </View>
   );
 }
@@ -528,10 +622,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     borderLeftWidth: 6,
-    borderLeftColor: theme.colors.green,
     marginBottom: 12,
     elevation: 3,
   },
+  tabsContainer: {marginBottom: 16},
+  tabsScroll: {gap: 8, paddingVertical: 4},
+  tabItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tag: {paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6},
   infos: {flex: 1, gap: 2},
   headerItem: {flexDirection: 'row', alignItems: 'center', gap: 8},
   fab: {
