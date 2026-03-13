@@ -4,21 +4,14 @@ import CustomText from '../CustomText';
 import CustomButton from '../CustomButton';
 import {MaterialIcons} from '@expo/vector-icons';
 import {useAppNavigation} from '../../hooks/useAppNavigation';
+import TotalProfit from '../TotalProfit';
 
 export default function ResumeNavigation() {
   const navigation = useAppNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.top}>
-        <View style={styles.topContent}>
-          <CustomText text="Total a Receber" color={theme.colors.primary} />
-          <CustomText
-            text="R$ 200.00"
-            fontSize="lg"
-            weight="bold"
-            color={theme.colors.green}
-          />
-        </View>
+        <TotalProfit />
       </View>
       <View style={styles.bottom}>
         <View style={styles.bottomButton}>
@@ -88,16 +81,6 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: theme.border.default,
-  },
-  topContent: {
-    width: '100%',
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    gap: theme.spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
   bottom: {
     width: '100%',
